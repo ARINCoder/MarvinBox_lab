@@ -1,0 +1,51 @@
+---
+title: "Regression"
+author: "Arvin"
+date: "2022-12-02"
+output: html_document
+---
+
+```{r}
+income1 <- read.csv("income.csv", header = TRUE)
+dim(income1)
+View(income1)
+attach(income1)
+levels(factor(INCOME))
+library(dplyr)
+library(readr)
+```
+
+
+```{r}
+
+for (n in 1:nrow(income1)) {
+  if(income1[n, "INCOME"] == "-10.000)"){
+    (income1$income_new[n] = 10000)
+  }else if(income1[n, "INCOME"] == "[10.000-15.000)"){
+    (income1$income_new[n] = 12500)
+  } else if(income1[n, "INCOME"] == "[15.000-20.000)"){
+    (income1$income_new[n] = 17500)
+  }else if (income1[n, "INCOME"] == "[20.000-25.000)"){
+    (income1$income_new[n] = 22500)
+ } else if (income1[n, "INCOME"] == "[25.000-30.000)"){
+    (income1$income_new[n] = 27500)
+ }else if (income1[n, "INCOME"] == "[30.000-40.000)"){
+    (income1$income_new[n] = 35000) 
+ }else if (income1[n, "INCOME"] == "[40.000-50.000)"){ 
+    (income1$income_new[n] = 45000)  
+ }else if (income1[n, "INCOME"] == "[50.000-75.000)"){
+    (income1$income_new[n] = 62500) 
+ } else {(income1$income_new[n] = 75000) }
+   }
+```
+
+
+```{r}
+View(income1)
+##CONVERING THE SEX into Numerics 0 and 1
+income1$SEX[income1$SEX == "M"] <- 1
+income1$SEX[income1$SEX == "F"] <- 0
+income1$SEX <- as.integer(income1$SEX)
+View(income1)
+```
+
