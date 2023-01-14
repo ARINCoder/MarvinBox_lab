@@ -1,0 +1,245 @@
+---
+title: "Clustering-Wines"
+author: "Marvin Githambo"
+date: "2023-01-13"
+output: html_document
+---
+
+```{r}
+##Introductiontoclustering.
+##Clusters can be describe as a group of objects, grouped with their respective attributes or characteristics.
+##It is a method often used or exploratory analysis of the data.
+##In clusetering we use unsupervised data, meaning that the observations given in the data set are unlabeled, there is no outcome to be predicted. It looks for simiLIAR attributes and groups the objects with respect to their attributes.
+##A widely used method for clustering is K-MEANS!
+```
+
+```{r}
+##KMEANS!
+kMEANS is a machine learning alogarithm, used to find a group of objects with similiar atttributes
+```
+
+```{r}
+##Loading the needed R libraries to work with and the data.
+
+library(plyr)
+library(ggplot2)
+library(cluster)
+library(lattice)
+library(graphics)
+library(grid)
+library(gridExtra)
+library(knitr)
+library(tidyr)
+library(tidyverse)
+library(corrplot)
+library(GGally)
+library(knitr)
+
+
+setwd("C://Users/user/Downloads")
+Wines0 <- read.csv("Wine.csv", header = TRUE)
+View(Wines0)
+```
+
+```{r}
+##The dataset Wines have 14columns but we exclude the column named customer segmaents since we don't use it in clustering(onlu unlabelled data)
+Wines1 <- Wines0[, 1:13] ; Wines1
+##Also we can use the code.
+Wines0[, -14]
+```
+
+```{r}
+##Exploring the dataset(Familiarizing with the dataset)
+##We use the function kable() (The kable() function in knitr is a very simple table generator, and is simple by design. It only generates tables for strictly rectangular data such as matrices and data frames)
+
+kable(head(Wines1)) ##First rows
+kable(tail(Wines1)) ##Last Rows.
+kable(summary(Wines1)) ##Summary
+str(Wines1)
+```
+
+~~Data Analysis~~
+
+```{r message=FALSE, fig.align='center'}
+## We need to explore and also visualize Wines1
+##gather() collects a set of column names and places them into a single “key” column
+##1.Histogram for each Attribute.
+
+Wines1 %>% 
+  gather(Attributes, value, 1:13) %>% 
+  ggplot(aes(x=value, fill=Attributes)) +
+  geom_histogram(colour="black", show.legend = FALSE) +
+  facet_wrap(~Attributes, scales="free_x")+
+  labs(x="values", y="Frequency", 
+       title = "Wines Attributes - Histogram") +
+  theme_bw()
+```
+
+```{r}
+##Histograms can be a poor method for determining the shape of a distribution because it is so strongly affected by the number of bins use, therefore, we can use density plot for each Attribute.
+##Kernal density plots are usually a much more effective way to view the distribution of a variable unlike Histogram. 
+ Wines1 %>% 
+  gather(Attributes, value, 1:13) %>% 
+  ggplot(aes(x= value, fill=Attributes)) +
+  geom_density(colour="black", alpha=0.5, show.legend = FALSE) +
+  facet_wrap(~Attributes, scales = "free_x")+
+  labs(x= "Values", y="Density", 
+       title = "Wines Attributes- Density Plot")+
+  theme_bw()
+```
+
+```{r}
+##Having see the different visualization of the dataset, what is the different relationship between the Attributes? We can use the function corrplot() so as to create a graphical display of a correlation matrix
+##Correlation matrix.
+corrplot(cor(Wines1), type = "upper",method = "ellipse", tl.cex = 0.9)
+##There is a stronger linear  correlation between "Total_Phenols" and "Flavanoids". We can model the relationship netween the two variable by fitting a linear equation.
+```
+
+```{r}
+##Relationship between Total_Phenols, and Flavanoids.
+##Lm, linear model(for linear realtionship)
+##geom_smooth adds a trend line in the plot.
+attach(Wines1)
+ggplot(Wines1, aes(x= Total_Phenols, y= Flavanoids)) +
+  geom_point()+
+  geom_smooth(method = "lm", se= FALSE )+
+  labs(title = "Wine Attributes", 
+       subtitle = "Relationship between Phenols and Flavanoids")+
+  theme_bw()
+
+##Now that we have done a exploratory data analysis, we can prepare the data in order to execute the k-means algorithm. 
+
+```
+
+\*\*Data preparation.
+
+```{r}
+##We start by normalizing the dataset, by normalizing we scale the data into a fixed(common) range(scale) usually 0 to 1 so that it reduces the scale of the variables.
+##In other words, normalization means adjusting values measured on different scales to a common scale.
+##Normalizing data
+Wines1Norm <- as.data.frame(scale(Wines1)) ; Wines1Norm
+ ##Original data
+r <- ggplot(Wines1,  aes(x=Alcohol, y= Malic_Acid))+
+  geom_point()+
+  labs(title = "Original data")+
+  theme_bw()
+r
+ ##Normolised data
+q <- ggplot(Wines1Norm, aes(x=Alcohol, y=Malic_Acid)) +
+  geom_point()+
+  labs(title = "Normalised data") +
+  theme_bw()
+q
+##Subplot
+grid.arrange(r,q, ncol=2)
+##The points of the normalised data is the same as the original data, the olu=y changes is the scale of the axis.
+```
+
+\*\*k-means execution
+
+```{r}
+##In this section we are going to execute the k-means algorithm and analyze the main components that the function returns. 
+##Execution of the k-means with k=2
+set.seed(1234)
+##The set. seed() function in R is used to create reproducible results when writing code that involves creating variables that take on random values. It makes sure you get the same results(random values) when you run the  code.
+Wines1_k2 <- kmeans(Wines1Norm, centers = 2)
+Wines1_k2
+The `kmeans()` function returns an object of class "`kmeans`" with information about the partition: 
+
+* `cluster`. A vector of integers indicating the cluster to which each point is allocated.
+
+* `centers`. A matrix of cluster centers.
+
+* `size`. The number of points in each cluster.
+
+
+```
+
+```{r}
+##Cluster to which  each point is located.
+Wines1_k2$cluster
+##Cluster centers
+Wines1_k2$centers
+#cluster size
+Wines1_k2$size
+
+```
+
+Additionally, the `kmeans()` function returns some ratios that let us know how compact is a cluster and how different are several clusters among themselves.
+
+-   `betweenss`. The between-cluster sum of squares. In an optimal segmentation, one expects this ratio to be as higher as possible, since we would like to have heterogeneous clusters.
+
+-   `withinss`. Vector of within-cluster sum of squares, one component per cluster. In an optimal segmentation, one expects this ratio to be as lower as possible for each cluster,
+
+-   since we would like to have homogeneity within the clusters.
+
+-   `tot.withinss`. Total within-cluster sum of squares.
+
+-   `totss`. The total sum of squares
+
+```{r}
+##between-clusters sumsofsquares
+Wines1_k2$betweenss
+##Within_cluster sum of squares.
+Wines1_k2$withinss
+##Total within-cluster sum of squares.
+Wines1_k2$tot.withinss
+##Total sum of squares.
+Wines1_k2$totss
+
+```
+
+```{r}
+##To study graphically which value of `k` gives us the best partition, we can plot `betweenss` and `tot.withinss` vs Choice of `k`. 
+bss <- numeric()
+wss <- numeric()
+
+##Run the algarithm  for different values of k
+for (i in 1:10) {
+    # For each k, calculate betweenss and tot.withinss
+bss[i] <- kmeans(Wines1Norm, centers =i)$betweenss
+wss[i] <- kmeans(Wines1Norm, centers =i)$tot.withinss
+}
+
+
+##Between-cluster sum of squares vs choice of k
+w <- qplot(1:10, bss, geom=c("point", "line"),
+           xlab =  "Numbers ofclusters", ylab= "Between-cluster sum of squares" ) +
+  scale_x_continuous(breaks = seq(0,10,1)) +
+  theme_bw()
+
+
+##Within-cluster sum of squares vs choice of k
+e <- qplot(1:10, wss, geom = c("point", "line"), 
+           xlab = "Number of clusters", ylab = "Within-cluster sum of squares") +
+  scale_x_continuous(breaks = seq(0,10,1)) +
+  theme_bw()
+
+
+##subplot
+grid.arrange(w,e, ncol=2)
+
+
+Which is the optimal value for `k`? One should choose a number of clusters so that adding another cluster doesn't give much better partition of the data. At some point the gain will drop, giving an angle in the graph (elbow criterion). 
+The number of clusters is chosen at this point. In our case, it is clear that 3 is the appropriate value for `k`. 
+```
+**Results
+```{r}
+##Execution of k-means with k=3
+set.seed(1234)
+wine1_km3 <- kmeans(Wines1Norm, centers = 2 )
+##Mean values of each cluster
+aggregate(Wines1, by= list(wine1_km3$cluster), mean)
+
+
+
+##Clustering
+ggpairs(cbind(Wines1, Cluster= as.factor(wine1_km3$cluster)),
+        columns = 1:6, aes(colour = Cluster, alpha= 0.5),
+        lower= list(continous = "points"),
+        upper= list(continous= "blank"), 
+        axisLabels= "none", switch = "both") +
+  theme_bw()
+
+```
+
