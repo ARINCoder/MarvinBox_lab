@@ -1,0 +1,39 @@
+---
+title: "Refresher Course"
+author: "Marvin Githamo"
+date: "2023-02-23"
+output: html_document
+---
+
+```{r}
+##Using the data Iris to perform a refresher course.
+View(iris)
+##Re-Ordering the Columns
+##We use the function setcolorder() in data.table package
+library(data.table)
+iris1 <- setcolorder(iris, c("Species", "Petal.Length", "Petal.Width", "Sepal.Length", "Sepal.Width"))
+##Calling the Iris1 data.
+iris1
+```
+
+
+```{r}
+##We now check for duplicates, we can check on the Sepal.Wiidth column
+##Using the duplicated ( ) function.
+duplicated(iris1$Sepal.Width)
+##We can see there are some duplicates we now remove the using the duplicated function.
+iris2 <- iris1[!duplicated(iris1$Sepal.Width), ]
+iris2
+str(iris1)
+dim(iris1)
+dim(iris2)
+##We can see the diference in the number of rows and columns in iris1 and iris2
+```
+
+```{r}
+##We now wish to save the new iris data as an excel file.
+##We install the package xlsx
+install.packages("xlsx")
+write.csv(iris2, "Iris2.csv")
+```
+
