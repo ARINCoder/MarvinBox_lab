@@ -1,0 +1,124 @@
+---
+title: "ASSIGNMENT"
+author: "......"
+date: "2023-08-24"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+```{r}
+library(tidymodels)
+library(tidyverse)
+library(ggplot2)
+library(datasets)
+```
+Question 1.
+Create a factor variable called days that contains the days of the week.
+```{r}
+# data set containing days of the week
+week_days <-c("Monday", "Tuesday", "Wednesday",
+              "Thursday", "Friday", "Saturday", "Sunday");week_days
+# Creating a factor variable
+week_days <-factor(week_days);week_days
+#To test whether a variable is truly a factor or not, we use the class() function
+class(week_days)
+```
+Question 2.
+Create an Identity matrix of dimensions 3 by 3.
+```{r}
+#Creating a 3 by 3 identity matrix
+ident_matrix <- base::diag(3);ident_matrix
+```
+```{r}
+#Create another 3 by 3 matrix whose data is a sequence from 1 to 9
+matrix_1 <-base::matrix(data = seq(1,9,1), 
+                              nrow = 3, ncol = 3);matrix_1
+```
+Matrix multiplication of the two matrices
+```{r}
+# Multiplying the two matrices by each other
+Multiplied_matrix <-ident_matrix %*% matrix_1
+Multiplied_matrix
+```
+Confirm whether matrix_1 is equal to Multiplied_matrix
+```{r}
+# Confirming the equality of the two matrices
+equal_matrix <- base::all(matrix_1 == Multiplied_matrix)
+equal_matrix
+# The output is TRUE, confirming that the second matrix, matrix_1 is equal to the output of the Multiplied matrix, since the first matrix, iden_matrix is identity multiplied with the second matrix, the result will be the same as that of the second matrix.
+```
+Question 3. 
+Using the starwars dataset
+Create a scatterplot using the base graphics of characters height (x-axis) against mass (y-axis).
+```{r}
+# Loading the required package
+library(dplyr)
+#Loading the data set to be used
+data("starwars")
+#Ploting the scatter plot, using the base graphics
+scatter_plot <- base::plot(x = starwars$height,
+           y = starwars$mass,
+           main = "Scatter plot of Height against Mass",
+           xlab = "Height", ylab = "Mass", col = "black", pch = 16)
+```
+
+
+Question 4.
+Create a histogram of birth year of "starwars"
+```{r}
+#Histogram of birth year
+attach(starwars)
+Hist_birth_year <- graphics::hist(birth_year, main = "Histogram of birth year")
+```
+
+
+Question 5.
+Creating the plots using ggplot2 package
+```{r}
+library(ggplot2)
+#Creating a scatter plot of Mass against Height
+scatter_plot_1 <-ggplot(data = starwars, mapping = aes(x = height, y = mass
+                                                       )) +
+  geom_point(na.rm = TRUE, col = "blue") +
+  ggtitle("SCATTER PLOT OF MASS AGAINST HEIGHT") +
+  theme_minimal();scatter_plot_1
+```
+```{r}
+#Creating a histogram
+Hist_birth_year_1 <-ggplot(data = starwars, mapping = aes(x = birth_year)) +
+  geom_histogram(na.rm = TRUE) +
+  ggtitle("HISTOGRAM OF BIRTH YEAR") +
+  theme_minimal();Hist_birth_year_1
+```
+Question 6.
+Create a function that takes in a character's name from the film star wars, and outputs the films in which the character appears.
+```{r}
+#Creating a list of the name (characters) and their associated films they appeared in.
+name_films <- list(
+  "Luke Skywalker" = c("The Empire Strikes Back","A New Hope", "Return of the Jedi", "The Force Awakens", "Revenge of the Sith"),
+  "Leia Organa" = c("A New Hope", "The Empire Strikes Back", "Return of the Jedi", "The Force Awakens"),
+  "Darth Vader" = c("A New Hope", "The Empire Strikes Back", "Return of the Jedi"),
+  "Han Solo" = c("A New Hope", "The Empire Strikes Back", "Return of the Jedi", "The Force Awakens"),
+  "Yoda" = c("The Empire Strikes Back", "Return of the Jedi"),
+  "Obi-Wan Kenobi" = c("A New Hope", "The Empire Strikes Back", "Return of the Jedi"),
+  "R2-D2" = c("A New Hope", "The Empire Strikes Back", "Return of the Jedi", "The Force Awakens"),
+  "C-3PO" = c("A New Hope", "The Empire Strikes Back", "Return of the Jedi", "The Force Awakens"),"Roos Tarpals" = c("The Phantom menace", "Padme Amidala" = "The phantom menace","Attack of the clones","Revenge of the Sith"),"Captain Phasma" = c("The force Awakens"), "Sly Moore" = c("Attack of the clones","Revenge of the Sith"), "Raymus Antilles" = c("Revenge of the Sith", "A new Hope")
+)
+#Creating the function that would output the character names that appeared in a film
+Films <- function(character_name) {
+  films <- name_films[[character_name]]
+  if (is.null(films)) {
+    return(paste("Character", character_name, "not found in the film(s)"))
+  } else {
+    return(films)
+  }
+}
+character_name <- "Raymus Antilles"
+films_participated <- Films(character_name);films_participated
+```
+```{r}
+character_name <-"Luke Skywalker"
+films_participated <- Films(character_name);films_participated
+```
+
